@@ -1,0 +1,82 @@
+name: publish
+
+on:
+  push:
+    branches:
+      - 'npm-v*'
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    env:
+      NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+
+      - name: Resolve version
+        id: version
+        run: |
+          set -euo pipefail
+          VERSION="${GITHUB_REF_NAME#npm-v}"
+          PKG_VERSION="$(node -p "require('./package.json').version")"
+          echo "version=$VERSION" >> "$GITHUB_OUTPUT"
+          echo "pkg_version=$PKG_VERSION" >> "$GITHUB_OUTPUT"
+
+      - name: Verify version matches branch
+        run: |
+          set -euo pipefail
+          if [ "${{ steps.version.outputs.version }}" != "${{ steps.version.outputs.pkg_version }}" ]; then
+            echo "package.json version (${{ steps.version.outputs.pkg_version }}) does not match branch ${{ github.ref_name }}" >&2
+            exit 1
+          fi
+
+      - name: Install dependencies
+        run: bun install --frozen-lockfile
+
+      - name: Test
+        run: bun run test
+
+      - name: Check if version is publishable
+        id: check
+        run: |
+          set -euo pipefail
+          VERSION="${{ steps.version.outputs.version }}"
+          PKG_NAME="$(node -p "require('./package.json').name")"
+          PUBLISHED="$(npm view "$PKG_NAME" versions --json 2>/dev/null || echo '[]')"
+          DECISION="$(node -e '
+            const v = process.argv[1];
+            let published = [];
+            try {
+              published = JSON.parse(process.argv[2]);
+            } catch {}
+            const num = (s) => s.split(".").map(Number);
+            const gt = (a, b) =>
+              a[0] > b[0] ||
+              (a[0] === b[0] && (a[1] > b[1] || (a[1] === b[1] && a[2] > b[2])));
+            const skip = published.includes(v) || published.some((p) => gt(num(p), num(v)));
+            console.log(skip ? "skip" : "publish");
+          ' "$VERSION" "$PUBLISHED")"
+          echo "decision=$DECISION" >> "$GITHUB_OUTPUT"
+
+      - name: Publish to npm
+        if: steps.check.outputs.decision == 'publish'
+        run: |
+          set -euo pipefail
+          node -e '
+            const fs = require("fs");
+            const pkg = JSON.parse(fs.readFileSync("package.json", "utf8"));
+            delete pkg.private;
+            fs.writeFileSync("package.json", JSON.stringify(pkg, null, "\t") + "\n");
+          '
+          echo "//registry.npmjs.org/:_authToken=$NPM_TOKEN" > "$HOME/.npmrc"
+          npm publish --access public
+
+      - name: Skip
+        if: steps.check.outputs.decision == 'skip'
+        run: echo "version already published or a newer version exists; nothing to do"
