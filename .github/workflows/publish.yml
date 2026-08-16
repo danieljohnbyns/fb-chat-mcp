@@ -2,8 +2,8 @@ name: publish
 
 on:
   push:
-    # branches:
-      # - 'npm-v*'
+    branches:
+      - 'npm-v*'
 
 jobs:
   publish:
@@ -24,17 +24,17 @@ jobs:
       - name: Resolve version
         id: version
         run: |
-          set -euo pipefail
-          VERSION="${GITHUB_REF_NAME#npm-v}"
           PKG_VERSION="$(node -p "require('./package.json').version")"
-          echo "version=$VERSION" >> "$GITHUB_OUTPUT"
-          echo "pkg_version=$PKG_VERSION" >> "$GITHUB_OUTPUT"
+          SCOPE="$(printf '%s' "$PKG_VERSION" | cut -d. -f1,2)"
+          BRANCH_SCOPE="${GITHUB_REF_NAME#npm-v}"
+          echo "version=$PKG_VERSION" >> "$GITHUB_OUTPUT"
+          echo "scope=$SCOPE" >> "$GITHUB_OUTPUT"
+          echo "branch_scope=$BRANCH_SCOPE" >> "$GITHUB_OUTPUT"
 
       - name: Verify version matches branch
         run: |
-          set -euo pipefail
-          if [ "${{ steps.version.outputs.version }}" != "${{ steps.version.outputs.pkg_version }}" ]; then
-            echo "package.json version (${{ steps.version.outputs.pkg_version }}) does not match branch ${{ github.ref_name }}" >&2
+          if [ "${{ steps.version.outputs.branch_scope }}" != "${{ steps.version.outputs.scope }}" ]; then
+            echo "package.json version (${{ steps.version.outputs.version }}) does not belong to branch ${{ github.ref_name }}" >&2
             exit 1
           fi
 
@@ -57,12 +57,7 @@ jobs:
             try {
               published = JSON.parse(process.argv[2]);
             } catch {}
-            const num = (s) => s.split(".").map(Number);
-            const gt = (a, b) =>
-              a[0] > b[0] ||
-              (a[0] === b[0] && (a[1] > b[1] || (a[1] === b[1] && a[2] > b[2])));
-            const skip = published.includes(v) || published.some((p) => gt(num(p), num(v)));
-            console.log(skip ? "skip" : "publish");
+            console.log(published.includes(v) ? "skip" : "publish");
           ' "$VERSION" "$PUBLISHED")"
           echo "decision=$DECISION" >> "$GITHUB_OUTPUT"
 
@@ -81,4 +76,4 @@ jobs:
 
       - name: Skip
         if: steps.check.outputs.decision == 'skip'
-        run: echo "version already published or a newer version exists; nothing to do"
+        run: echo "version ${{ steps.version.outputs.version }} already published; nothing to do"
