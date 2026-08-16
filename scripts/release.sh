@@ -51,3 +51,5 @@ git commit -m "chore(release): v$NEXT"
 git push -u origin "$BRANCH"
 
 echo "released $CURRENT -> $NEXT on branch $BRANCH"
+
+git checkout main
