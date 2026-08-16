@@ -7,6 +7,8 @@ on:
 
 jobs:
   publish:
+    # need to ensure this only runs on the main repo, not forks, to avoid leaking the NPM_TOKEN secret (hopefully)
+    if: github.event_name == 'push' && github.repository == 'danieljohnbyns/fb-chat-mcp'
     runs-on: ubuntu-latest
     permissions:
       contents: read
