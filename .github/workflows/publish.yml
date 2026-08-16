@@ -3,7 +3,9 @@ name: publish
 on:
   push:
     branches:
-      - 'npm-v*'
+      - main
+    paths:
+      - package.json
 
 jobs:
   publish:
@@ -21,23 +23,6 @@ jobs:
         with:
           bun-version: latest
 
-      - name: Resolve version
-        id: version
-        run: |
-          PKG_VERSION="$(node -p "require('./package.json').version")"
-          SCOPE="$(printf '%s' "$PKG_VERSION" | cut -d. -f1,2)"
-          BRANCH_SCOPE="${GITHUB_REF_NAME#npm-v}"
-          echo "version=$PKG_VERSION" >> "$GITHUB_OUTPUT"
-          echo "scope=$SCOPE" >> "$GITHUB_OUTPUT"
-          echo "branch_scope=$BRANCH_SCOPE" >> "$GITHUB_OUTPUT"
-
-      - name: Verify version matches branch
-        run: |
-          if [ "${{ steps.version.outputs.branch_scope }}" != "${{ steps.version.outputs.scope }}" ]; then
-            echo "package.json version (${{ steps.version.outputs.version }}) does not belong to branch ${{ github.ref_name }}" >&2
-            exit 1
-          fi
-
       - name: Install dependencies
         run: bun install --frozen-lockfile
 
@@ -48,7 +33,7 @@ jobs:
         id: check
         run: |
           set -euo pipefail
-          VERSION="${{ steps.version.outputs.version }}"
+          VERSION="$(node -p "require('./package.json').version")"
           PKG_NAME="$(node -p "require('./package.json').name")"
           PUBLISHED="$(npm view "$PKG_NAME" versions --json 2>/dev/null || echo '[]')"
           DECISION="$(node -e '
@@ -59,6 +44,7 @@ jobs:
             } catch {}
             console.log(published.includes(v) ? "skip" : "publish");
           ' "$VERSION" "$PUBLISHED")"
+          echo "version=$VERSION" >> "$GITHUB_OUTPUT"
           echo "decision=$DECISION" >> "$GITHUB_OUTPUT"
 
       - name: Publish to npm
@@ -76,4 +62,4 @@ jobs:
 
       - name: Skip
         if: steps.check.outputs.decision == 'skip'
-        run: echo "version ${{ steps.version.outputs.version }} already published; nothing to do"
+        run: echo "version ${{ steps.check.outputs.version }} already published; nothing to do"

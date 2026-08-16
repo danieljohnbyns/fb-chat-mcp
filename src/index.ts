@@ -4,9 +4,11 @@ import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
 import { StdioServerTransport } from '@modelcontextprotocol/sdk/server/stdio.js';
 import { z } from 'zod';
 
+import packageJson from '../package.json' with { type: 'json' };
+
 const server = new McpServer({
 	name: 'fb-chat-mcp',
-	version: '0.1.0'
+	version: packageJson.version
 });
 
 server.registerTool(
