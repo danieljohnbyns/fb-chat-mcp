@@ -1,0 +1,11 @@
+{
+	"extends": "./tsconfig.json",
+	"compilerOptions": {
+		"module": "ESNext",
+		"moduleResolution": "bundler",
+		"types": ["jest"],
+		"verbatimModuleSyntax": false,
+		"esModuleInterop": true
+	},
+	"include": ["tests", "jest.config.ts"]
+}

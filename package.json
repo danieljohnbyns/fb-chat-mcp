@@ -1,0 +1,32 @@
+{
+	"name": "fb-chat-mcp",
+	"module": "src/index.ts",
+	"type": "module",
+	"private": true,
+	"bin": {
+		"fb-chat-mcp": "./src/index.ts"
+	},
+	"scripts": {
+		"test": "jest"
+	},
+	"devDependencies": {
+		"@eslint/js": "^10.0.1",
+		"@types/bun": "latest",
+		"@types/jest": "^30.0.0",
+		"eslint": "^10.8.1",
+		"globals": "^17.11.0",
+		"jest": "^30.4.2",
+		"jiti": "^2.7.0",
+		"prettier": "^3.9.6",
+		"ts-jest": "^29.4.12",
+		"typescript-eslint": "^8.67.0"
+	},
+	"peerDependencies": {
+		"typescript": "^5"
+	},
+	"dependencies": {
+		"@modelcontextprotocol/sdk": "^1.30.0",
+		"meta-messenger.js": "^1.1.3",
+		"zod": "^4.4.3"
+	}
+}
