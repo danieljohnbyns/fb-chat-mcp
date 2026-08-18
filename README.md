@@ -31,7 +31,7 @@ npm install -g fb-chat-mcp
 Or run without installing:
 
 ```bash
-npx fb-chat-mcp
+npx -y fb-chat-mcp@latest
 ```
 
 With bun:
@@ -39,7 +39,7 @@ With bun:
 ```bash
 bun add -g fb-chat-mcp
 # or
-bunx fb-chat-mcp
+bunx fb-chat-mcp@latest
 ```
 
 > **bun users:** bun blocks package postinstall scripts by default. The native library
@@ -89,7 +89,7 @@ Point your MCP client at the server with stdio. Example for Claude Desktop (`cla
 	"mcpServers": {
 		"fb-chat-mcp": {
 			"command": "npx",
-			"args": ["fb-chat-mcp"],
+			"args": ["-y", "fb-chat-mcp@latest"],
 			"env": {
 				"FB_COOKIES_PATH": "/absolute/path/to/cookies.json"
 			}
@@ -105,7 +105,7 @@ With bun:
 	"mcpServers": {
 		"fb-chat-mcp": {
 			"command": "bunx",
-			"args": ["fb-chat-mcp"],
+			"args": ["fb-chat-mcp@latest"],
 			"env": {
 				"FB_COOKIES_PATH": "/absolute/path/to/cookies.json"
 			}
