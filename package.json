@@ -1,16 +1,20 @@
 {
 	"name": "fb-chat-mcp",
 	"version": "0.3.0",
-	"module": "src/index.ts",
+	"module": "dist/index.js",
+	"main": "dist/index.js",
 	"type": "module",
 	"private": true,
 	"bin": {
-		"fb-chat-mcp": "./src/index.ts"
+		"fb-chat-mcp": "./dist/index.js"
 	},
 	"files": [
-		"src"
+		"dist",
+		"scripts/ensure-native.mjs"
 	],
 	"scripts": {
+		"build": "bun build src/index.ts --target=node --format=esm --packages=external --outdir dist",
+		"prepublishOnly": "bun run build",
 		"test": "jest",
 		"postinstall": "node scripts/ensure-native.mjs"
 	},

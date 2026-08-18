@@ -1,3 +1,4 @@
+import { existsSync } from 'node:fs';
 import fs from 'fs/promises';
 import path from 'path';
 import { z } from 'zod';
@@ -16,7 +17,7 @@ const cookiesSchema = z.object({
 
 type Cookies = z.infer<typeof cookiesSchema>;
 
-if (!(await fs.exists(cookiesPath)))
+if (!existsSync(cookiesPath))
 	throw new Error(`Cookies file not found at ${cookiesPath}`);
 
 const raw = JSON.parse(await fs.readFile(cookiesPath, 'utf8'));

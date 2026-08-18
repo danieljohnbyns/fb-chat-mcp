@@ -1,14 +1,18 @@
 // Ensures the meta-messenger.js native library (messagix.{so,dylib,dll})
 // is present after install. npm runs dependency postinstall scripts itself,
 // but bun does not by default, so this repo-level postinstall downloads the
-// prebuilt binary when it is missing. Works under both node and bun.
+// prebuilt binary when it is missing. Works under both node and bun, and
+// resolves meta-messenger.js wherever node hoisting/pnpm layouts place it.
 import { existsSync } from 'node:fs';
 import { spawnSync } from 'node:child_process';
-import { join, resolve, dirname } from 'node:path';
+import { createRequire } from 'node:module';
+import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-const __dirname = dirname(fileURLToPath(import.meta.url));
-const packageRoot = resolve(__dirname, '..');
+const require = createRequire(import.meta.url);
+
+const downloadScript = require.resolve('meta-messenger.js/scripts/download-prebuilt.mjs');
+const pkgRoot = dirname(dirname(downloadScript));
 
 const ext =
 	process.platform === 'win32'
@@ -16,17 +20,38 @@ const ext =
 		: process.platform === 'darwin'
 			? 'dylib'
 			: 'so';
-const nativeLib = join(
-	packageRoot,
-	'node_modules',
-	'meta-messenger.js',
-	'build',
-	`messagix.${ext}`
-);
+const nativeLib = join(pkgRoot, 'build', `messagix.${ext}`);
 
 if (existsSync(nativeLib)) {
 	console.log(`[ensure-native] Native library already present: ${nativeLib}`);
 	process.exit(0);
+}
+
+// Under npm/yarn/pnpm, meta-messenger.js's own postinstall runs as part of the
+// install (concurrently with ours) and downloads the native library. Installing
+// again here would race that downloader and corrupt its shared temp file, so
+// those installers own the download: we just verify and exit.
+const isBun = String(process.env.npm_config_user_agent || '').startsWith('bun/');
+if (!isBun) {
+	console.warn(
+		'[ensure-native] Native library missing; meta-messenger.js postinstall should have placed it.' +
+			' Remove node_modules and re-run the install if this persists.'
+	);
+	process.exit(0);
+}
+
+// bun-only gap. When the consumer also trusts meta-messenger.js, bun runs its
+// postinstall concurrently with ours; wait for that download to land (the
+// prebuilt transfers in ~seconds) before falling back to downloading here.
+console.log(`[ensure-native] Waiting for native library: ${nativeLib}`);
+const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+const deadline = Date.now() + 20_000;
+while (Date.now() < deadline) {
+	if (existsSync(nativeLib)) {
+		console.log(`[ensure-native] Native library ready: ${nativeLib}`);
+		process.exit(0);
+	}
+	await sleep(250);
 }
 
 console.log(`[ensure-native] Native library missing: ${nativeLib}`);
@@ -34,13 +59,6 @@ console.log(
 	'[ensure-native] Downloading prebuilt binary from GitHub Releases...'
 );
 
-const downloadScript = join(
-	packageRoot,
-	'node_modules',
-	'meta-messenger.js',
-	'scripts',
-	'download-prebuilt.mjs'
-);
 if (!existsSync(downloadScript)) {
 	console.error(
 		`[ensure-native] Could not find ${downloadScript}.\n` +
