@@ -5,7 +5,7 @@ import { StdioServerTransport } from '@modelcontextprotocol/sdk/server/stdio.js'
 import { messengerClient, messengerUser } from './utils/client.js';
 import registry from './utils/registry.js';
 
-import './tools/getUserInfo.js';
+import './tools/users/getUserInfo.js';
 
 import packageJson from '../package.json' with { type: 'json' };
 

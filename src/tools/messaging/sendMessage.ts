@@ -7,30 +7,32 @@ registry.register(
 	'sendMessage',
 	{
 		title: 'Send Message',
-		description: 'Sends a message to a user.',
+		description: 'Send a text message',
 		inputSchema: {
-			threadId: z
-				.string()
-				.describe('The ID of the thread to send the message to.'),
+			threadId: z.string().describe('Thread ID to send to'),
 			options: z
 				.object({
-					text: z.string().describe('The text of the message to send.'),
-					replyToId: z
-						.string()
+					text: z.string().describe('Text content'),
+					replyToId: z.string().optional().describe('Reply to message ID'),
+					attachmentFbIds: z
+						.array(z.string())
+						.transform((ids) => ids.map((id) => BigInt(id)))
 						.optional()
-						.describe('The ID of the message to reply to.'),
+						.describe(
+							'Pre-uploaded attachment Facebook IDs (from uploadMedia)'
+						),
 					mentions: z
 						.array(
 							z.object({
-								userId: z.bigint(),
+								userId: z.string().transform((id) => BigInt(id)),
 								offset: z.number(),
 								length: z.number()
 							})
 						)
 						.optional()
-						.describe('An array of mentions to include in the message.')
+						.describe('User IDs to mention')
 				})
-				.describe('The message to send.')
+				.describe('Message options (text, reply, mentions)')
 		}
 	},
 	async ({
@@ -41,11 +43,15 @@ registry.register(
 		options: Parameters<(typeof messengerClient)['sendMessage']>[1];
 	}) => {
 		const result = await messengerClient.sendMessage(BigInt(threadId), options);
+		const serializable = {
+			...result,
+			timestampMs: result.timestampMs.toString()
+		};
 		return {
 			content: [
 				{
 					type: 'text' as const,
-					text: JSON.stringify(result, null, 2)
+					text: JSON.stringify(serializable, null, 2)
 				}
 			],
 			structuredContent: { messageId: result.messageId }
