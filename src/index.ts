@@ -5,6 +5,12 @@ import { StdioServerTransport } from '@modelcontextprotocol/sdk/server/stdio.js'
 import { messengerClient, messengerUser } from './utils/client.js';
 import registry from './utils/registry.js';
 
+import './tools/messaging/sendMessage.js';
+import './tools/messaging/sendReaction.js';
+import './tools/messaging/editMessage.js';
+import './tools/messaging/unsendMessage.js';
+import './tools/messaging/sendTypingIndicator.js';
+import './tools/messaging/markAsRead.js';
 import './tools/users/getUserInfo.js';
 
 import packageJson from '../package.json' with { type: 'json' };
