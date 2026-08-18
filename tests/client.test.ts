@@ -1,5 +1,25 @@
+import { readdir, readFile } from 'node:fs/promises';
+import { join } from 'node:path';
 import { Client } from '@modelcontextprotocol/sdk/client/index.js';
 import { StdioClientTransport } from '@modelcontextprotocol/sdk/client/stdio.js';
+
+const TOOLS_DIR = join(__dirname, '..', 'src', 'tools');
+
+const toolFiles = async () =>
+	(await readdir(TOOLS_DIR, { recursive: true }))
+		.filter((f) => String(f).endsWith('.ts'))
+		.map((f) => join(TOOLS_DIR, String(f)));
+
+const registeredToolNames = async () =>
+	(
+		await Promise.all(
+			(await toolFiles()).map(async (file) =>
+				/registry\.register\(\s*'([^']+)'\s*,/.exec(
+					await readFile(file, 'utf8')
+				)?.[1]
+			)
+		)
+	).filter((name): name is string => Boolean(name));
 
 describe('fb-chat-mcp test client', () => {
 	let client: Client;
@@ -18,44 +38,11 @@ describe('fb-chat-mcp test client', () => {
 		await client.close();
 	});
 
-	it('exposes the registered tools', async () => {
+	it('exposes every registered tool', async () => {
 		const tools = await client.listTools();
-		const names = tools.tools.map((t) => t.name);
-		for (const tool of [
-			'sendMessage',
-			'sendReaction',
-			'editMessage',
-			'unsendMessage',
-			'sendTypingIndicator',
-			'markAsRead',
-			'getUserInfo',
-			'searchUsers',
-			'createThread',
-			'renameThread',
-			'muteThread',
-			'unmuteThread',
-			'deleteThread',
-			'uploadMedia',
-			'sendImage',
-			'sendVideo',
-			'sendVoice',
-			'sendFile',
-			'sendSticker',
-			'setGroupPhoto',
-			'sendE2EEMessage',
-			'sendE2EEReaction',
-			'sendE2EETyping',
-			'editE2EEMessage',
-			'unsendE2EEMessage',
-			'sendE2EEImage',
-			'sendE2EEVideo',
-			'sendE2EEAudio',
-			'sendE2EEDocument',
-			'sendE2EESticker',
-			'downloadE2EEMedia',
-			'getDeviceData',
-			'registerPushNotifications'
-		])
+		const names = new Set(tools.tools.map((t) => t.name));
+		for (const tool of await registeredToolNames())
 			expect(names).toContain(tool);
+		expect(names.size).toBe(tools.tools.length);
 	});
 });
