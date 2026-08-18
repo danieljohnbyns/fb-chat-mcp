@@ -12,6 +12,7 @@ import './tools/messaging/unsendMessage.js';
 import './tools/messaging/sendTypingIndicator.js';
 import './tools/messaging/markAsRead.js';
 import './tools/users/getUserInfo.js';
+import './tools/users/searchUsers.js';
 
 import packageJson from '../package.json' with { type: 'json' };
 
