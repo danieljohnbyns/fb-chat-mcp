@@ -25,6 +25,17 @@ import './tools/media/sendVoice.js';
 import './tools/media/sendFile.js';
 import './tools/media/sendSticker.js';
 import './tools/media/setGroupPhoto.js';
+import './tools/e2ee/sendE2EEMessage.js';
+import './tools/e2ee/sendE2EEReaction.js';
+import './tools/e2ee/sendE2EETyping.js';
+import './tools/e2ee/editE2EEMessage.js';
+import './tools/e2ee/unsendE2EEMessage.js';
+import './tools/e2ee/sendE2EEImage.js';
+import './tools/e2ee/sendE2EEVideo.js';
+import './tools/e2ee/sendE2EEAudio.js';
+import './tools/e2ee/sendE2EEDocument.js';
+import './tools/e2ee/sendE2EESticker.js';
+import './tools/e2ee/downloadE2EEMedia.js';
 
 import packageJson from '../package.json' with { type: 'json' };
 
