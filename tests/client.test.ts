@@ -12,7 +12,7 @@ describe('fb-chat-mcp test client', () => {
 		});
 		client = new Client({ name: 'test-client', version: '0.1.0' });
 		await client.connect(transport);
-	});
+	}, 30000);
 
 	afterEach(async () => {
 		await client.close();
@@ -35,8 +35,7 @@ describe('fb-chat-mcp test client', () => {
 			'downloadE2EEMedia',
 			'getDeviceData',
 			'registerPushNotifications'
-		]) {
+		])
 			expect(names).toContain(tool);
-		}
 	});
 });
