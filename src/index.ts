@@ -2,9 +2,10 @@
 
 import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
 import { StdioServerTransport } from '@modelcontextprotocol/sdk/server/stdio.js';
-import { Client } from 'meta-messenger.js';
+import { messengerClient, messengerUser } from './utils/client.js';
+import registry from './utils/registry.js';
 
-import { cookieStore } from './utils/cookies.js';
+import './tools/getUserInfo.js';
 
 import packageJson from '../package.json' with { type: 'json' };
 
@@ -13,30 +14,12 @@ const server = new McpServer({
 	version: packageJson.version
 });
 
+registry.registerAll(server);
+
 console.log(`Starting fb-chat-mcp v${packageJson.version}...`);
 
-const client = new Client(cookieStore.getState().cookies);
-const { user } = await client.connect();
-
-server.registerTool(
-	'getUserInfo',
-	{
-		title: 'Get User Info',
-		description: 'Returns information about the current user.',
-		inputSchema: {}
-	},
-	async () => {
-		return {
-			content: [
-				{ type: 'text', text: `User ID: ${user.id}` },
-				{ type: 'text', text: `User Name: ${user.name}` }
-			]
-		};
-	}
-);
-
-client.on('fullyReady', async () => {
+messengerClient.on('fullyReady', async () => {
 	const transport = new StdioServerTransport();
 	await server.connect(transport);
 });
-console.log(`Logged in: ${user.name} (${user.id})`);
+console.log(`Logged in: ${messengerUser.name} (${messengerUser.id})`);
