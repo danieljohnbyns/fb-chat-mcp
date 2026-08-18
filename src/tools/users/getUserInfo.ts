@@ -14,6 +14,17 @@ registry.register(
 				.transform((id) => BigInt(id))
 				.optional()
 				.describe('User ID')
+		},
+		outputSchema: {
+			id: z.string(),
+			name: z.string(),
+			firstName: z.string().optional(),
+			username: z.string().optional(),
+			profilePictureUrl: z.string().optional(),
+			isMessengerUser: z.boolean().optional(),
+			isVerified: z.boolean().optional(),
+			gender: z.number().optional(),
+			canViewerMessage: z.boolean().optional()
 		}
 	},
 	async ({

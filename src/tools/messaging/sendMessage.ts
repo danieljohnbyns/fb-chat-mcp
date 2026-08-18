@@ -33,6 +33,10 @@ registry.register(
 						.describe('User IDs to mention')
 				})
 				.describe('Message options (text, reply, mentions)')
+		},
+		outputSchema: {
+			messageId: z.string(),
+			timestampMs: z.string()
 		}
 	},
 	async ({
@@ -43,18 +47,18 @@ registry.register(
 		options: Parameters<(typeof messengerClient)['sendMessage']>[1];
 	}) => {
 		const result = await messengerClient.sendMessage(BigInt(threadId), options);
-		const serializable = {
-			...result,
+		const structured = {
+			messageId: result.messageId,
 			timestampMs: result.timestampMs.toString()
 		};
 		return {
 			content: [
 				{
 					type: 'text' as const,
-					text: JSON.stringify(serializable, null, 2)
+					text: JSON.stringify(structured, null, 2)
 				}
 			],
-			structuredContent: { messageId: result.messageId }
+			structuredContent: structured
 		};
 	}
 );
