@@ -11,8 +11,12 @@
 		"src"
 	],
 	"scripts": {
-		"test": "jest"
+		"test": "jest",
+		"postinstall": "node scripts/ensure-native.mjs"
 	},
+	"trustedDependencies": [
+		"meta-messenger.js"
+	],
 	"devDependencies": {
 		"@eslint/js": "^10.0.1",
 		"@types/bun": "latest",
