@@ -3,7 +3,6 @@
 import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
 import { StdioServerTransport } from '@modelcontextprotocol/sdk/server/stdio.js';
 import { Client } from 'meta-messenger.js';
-import { z } from 'zod';
 
 import { cookieStore } from './utils/cookies.js';
 
@@ -17,26 +16,27 @@ const server = new McpServer({
 console.log(`Starting fb-chat-mcp v${packageJson.version}...`);
 
 const client = new Client(cookieStore.getState().cookies);
-const { user, initialData } = await client.connect();
-console.log(`Logged in: ${user.name} (${user.id})`);
-console.log(`Thread count: ${initialData.threads.length}`);
+const { user } = await client.connect();
 
 server.registerTool(
-	'hello',
+	'getUserInfo',
 	{
-		title: 'Hello',
-		description: 'Returns a friendly greeting.',
-		inputSchema: {
-			name: z.string().optional().describe('The name to greet')
-		}
+		title: 'Get User Info',
+		description: 'Returns information about the current user.',
+		inputSchema: {}
 	},
-	async ({ name }) => {
-		const subject = name ?? 'world';
+	async () => {
 		return {
-			content: [{ type: 'text', text: `Hello, ${subject}!` }]
+			content: [
+				{ type: 'text', text: `User ID: ${user.id}` },
+				{ type: 'text', text: `User Name: ${user.name}` }
+			]
 		};
 	}
 );
 
-const transport = new StdioServerTransport();
-await server.connect(transport);
+client.on('fullyReady', async () => {
+	const transport = new StdioServerTransport();
+	await server.connect(transport);
+});
+console.log(`Logged in: ${user.name} (${user.id})`);
