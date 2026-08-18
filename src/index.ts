@@ -36,6 +36,8 @@ import './tools/e2ee/sendE2EEAudio.js';
 import './tools/e2ee/sendE2EEDocument.js';
 import './tools/e2ee/sendE2EESticker.js';
 import './tools/e2ee/downloadE2EEMedia.js';
+import './tools/device/getDeviceData.js';
+import './tools/device/registerPushNotifications.js';
 
 import packageJson from '../package.json' with { type: 'json' };
 

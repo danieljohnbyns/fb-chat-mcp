@@ -18,21 +18,25 @@ describe('fb-chat-mcp test client', () => {
 		await client.close();
 	});
 
-	it('exposes the hello tool', async () => {
+	it('exposes the registered tools', async () => {
 		const tools = await client.listTools();
-		expect(tools.tools.map((t) => t.name)).toContain('hello');
-	});
-
-	it('calls hello without a name', async () => {
-		const result = await client.callTool({ name: 'hello', arguments: {} });
-		expect(result.content).toEqual([{ type: 'text', text: 'Hello, world!' }]);
-	});
-
-	it('calls hello with a name', async () => {
-		const result = await client.callTool({
-			name: 'hello',
-			arguments: { name: 'Daniel' }
-		});
-		expect(result.content).toEqual([{ type: 'text', text: 'Hello, Daniel!' }]);
+		const names = tools.tools.map((t) => t.name);
+		for (const tool of [
+			'sendMessage',
+			'getUserInfo',
+			'searchUsers',
+			'createThread',
+			'deleteThread',
+			'uploadMedia',
+			'sendImage',
+			'sendSticker',
+			'sendE2EEMessage',
+			'editE2EEMessage',
+			'downloadE2EEMedia',
+			'getDeviceData',
+			'registerPushNotifications'
+		]) {
+			expect(names).toContain(tool);
+		}
 	});
 });
