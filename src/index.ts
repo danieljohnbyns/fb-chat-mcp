@@ -18,6 +18,13 @@ import './tools/threads/renameThread.js';
 import './tools/threads/muteThread.js';
 import './tools/threads/unmuteThread.js';
 import './tools/threads/deleteThread.js';
+import './tools/media/uploadMedia.js';
+import './tools/media/sendImage.js';
+import './tools/media/sendVideo.js';
+import './tools/media/sendVoice.js';
+import './tools/media/sendFile.js';
+import './tools/media/sendSticker.js';
+import './tools/media/setGroupPhoto.js';
 
 import packageJson from '../package.json' with { type: 'json' };
 
