@@ -36,9 +36,9 @@ const semicolonRule: Rule.RuleModule = {
 				node.type === 'IfStatement'
 					? node.consequent
 					: 'body' in node &&
-						node.body &&
-						!Array.isArray(node.body) &&
-						'type' in node.body
+						  node.body &&
+						  !Array.isArray(node.body) &&
+						  'type' in node.body
 						? (node.body as Rule.Node)
 						: null;
 			// Check if the body is a BlockStatement (single or multiple statements)
@@ -48,7 +48,7 @@ const semicolonRule: Rule.RuleModule = {
 
 				if (lastToken && lastToken.value === '}')
 					reportMissingSemicolon(node, lastToken);
-			}
+			};
 
 			// For IfStatements, also check the else block (alternate)
 			if (node.type === 'IfStatement' && node.alternate) {
@@ -66,8 +66,8 @@ const semicolonRule: Rule.RuleModule = {
 							alternate as unknown as Rule.Node,
 							lastToken
 						);
-				}
-			}
+				};
+			};
 		};
 
 		const checkTryStatement = (node: Rule.Node) => {
@@ -91,7 +91,7 @@ const semicolonRule: Rule.RuleModule = {
 
 				if (lastToken && lastToken.value === '}')
 					reportMissingSemicolon(node, lastToken);
-			}
+			};
 		};
 
 		const checkMethodDefinition = (node: Rule.Node) => {
@@ -104,7 +104,7 @@ const semicolonRule: Rule.RuleModule = {
 
 				if (lastToken && lastToken.value === '}')
 					reportMissingSemicolon(node, lastToken);
-			}
+			};
 		};
 
 		const checkClassDeclaration = (node: Rule.Node) => {
@@ -117,7 +117,7 @@ const semicolonRule: Rule.RuleModule = {
 
 				if (lastToken && lastToken.value === '}')
 					reportMissingSemicolon(node, lastToken);
-			}
+			};
 		};
 
 		const checkWithStatement = (node: Rule.Node) => {
@@ -129,7 +129,7 @@ const semicolonRule: Rule.RuleModule = {
 
 				if (lastToken && lastToken.value === '}')
 					reportMissingSemicolon(node, lastToken);
-			}
+			};
 		};
 
 		const checkArrowFunctionExpression = (node: Rule.Node) => {
@@ -156,7 +156,7 @@ const semicolonRule: Rule.RuleModule = {
 
 				if (lastToken && lastToken.value === '}')
 					reportMissingSemicolon(node, lastToken);
-			}
+			};
 		};
 
 		const checkFunctionExpression = (node: Rule.Node) => {
@@ -180,7 +180,7 @@ const semicolonRule: Rule.RuleModule = {
 
 				if (lastToken && lastToken.value === '}')
 					reportMissingSemicolon(node, lastToken);
-			}
+			};
 		};
 
 		return {
@@ -220,9 +220,9 @@ const unnecesaryCurlyRule: Rule.RuleModule = {
 				node.type === 'IfStatement'
 					? node.consequent
 					: 'body' in node &&
-						node.body &&
-						!Array.isArray(node.body) &&
-						'type' in node.body
+						  node.body &&
+						  !Array.isArray(node.body) &&
+						  'type' in node.body
 						? (node.body as Rule.Node)
 						: null;
 			// Check if body is a block with a single statement
@@ -278,7 +278,7 @@ const avoidForEachRule: Rule.RuleModule = {
 							node,
 							messageId: 'avoidForEach'
 						});
-				}
+				};
 			}
 		};
 	}

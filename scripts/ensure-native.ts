@@ -44,7 +44,7 @@ const downloadScript = join(
 if (!existsSync(downloadScript)) {
 	console.error(
 		`[ensure-native] Could not find ${downloadScript}.\n` +
-		'  meta-messenger.js is not installed. Run `bun install` first.'
+			'  meta-messenger.js is not installed. Run `bun install` first.'
 	);
 	process.exit(1);
 };
@@ -60,8 +60,8 @@ if (res.status === 0 && existsSync(nativeLib)) {
 
 console.error(
 	'[ensure-native] Failed to obtain the native library.\n' +
-	'  Check your network connection, or install Go and run:\n' +
-	'    MESSAGIX_BUILD_FROM_SOURCE=true bun install\n' +
-	'  (requires clone of yumi-team/meta-messenger.js for the Go source)'
+		'  Check your network connection, or install Go and run:\n' +
+		'    MESSAGIX_BUILD_FROM_SOURCE=true bun install\n' +
+		'  (requires clone of yumi-team/meta-messenger.js for the Go source)'
 );
 process.exit(1);

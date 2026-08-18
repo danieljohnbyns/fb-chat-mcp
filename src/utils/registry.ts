@@ -2,7 +2,10 @@ import type {
 	McpServer,
 	ToolCallback
 } from '@modelcontextprotocol/sdk/server/mcp.js';
-import type { ZodRawShapeCompat, AnySchema } from '@modelcontextprotocol/sdk/server/zod-compat.js';
+import type {
+	ZodRawShapeCompat,
+	AnySchema
+} from '@modelcontextprotocol/sdk/server/zod-compat.js';
 
 type ToolConfig = {
 	title?: string;

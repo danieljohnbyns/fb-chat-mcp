@@ -13,6 +13,11 @@ import './tools/messaging/sendTypingIndicator.js';
 import './tools/messaging/markAsRead.js';
 import './tools/users/getUserInfo.js';
 import './tools/users/searchUsers.js';
+import './tools/threads/createThread.js';
+import './tools/threads/renameThread.js';
+import './tools/threads/muteThread.js';
+import './tools/threads/unmuteThread.js';
+import './tools/threads/deleteThread.js';
 
 import packageJson from '../package.json' with { type: 'json' };
 

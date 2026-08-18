@@ -47,7 +47,9 @@ if (status.behind > 0) {
 };
 
 // Read the current version from package.json
-const packageJson = JSON.parse(fs.readFileSync(path.resolve(process.cwd(), 'package.json'), 'utf-8'));
+const packageJson = JSON.parse(
+	fs.readFileSync(path.resolve(process.cwd(), 'package.json'), 'utf-8')
+);
 const currentVersion = packageJson.version;
 const versionParts = currentVersion.split('.').map(Number) as [
 	number,
@@ -106,4 +108,3 @@ if (method === 'major' || method === 'minor') {
 	await git.checkout('main');
 	console.log(`Release branch '${releaseBranch}' created and pushed.`);
 };
-
