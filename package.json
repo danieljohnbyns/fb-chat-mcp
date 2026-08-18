@@ -12,7 +12,7 @@
 	],
 	"scripts": {
 		"test": "jest",
-		"postinstall": "bun scripts/ensure-native.ts"
+		"postinstall": "node scripts/ensure-native.mjs"
 	},
 	"trustedDependencies": [
 		"meta-messenger.js"
