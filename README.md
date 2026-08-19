@@ -1,5 +1,7 @@
 # fb-chat-mcp
 
+[![npm version](https://img.shields.io/npm/v/fb-chat-mcp.svg)](https://www.npmjs.com/package/fb-chat-mcp)
+
 An [MCP](https://modelcontextprotocol.io) server that exposes Facebook Messenger as a tool suite for AI assistants. It connects to your Facebook account and lets MCP clients send messages, react, manage threads, share media, and use end-to-end-encrypted chats.
 
 Runs on both **Node.js** and **Bun**.
