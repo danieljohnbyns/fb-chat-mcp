@@ -7,6 +7,11 @@
 	"main": "dist/index.js",
 	"type": "module",
 	"private": true,
+	"author": {
+		"name": "Daniel John Baynosa",
+		"url": "http://danieljohnbyns.online/",
+		"email": "danieljohnbyns@gmail.com"
+	},
 	"bin": {
 		"fb-chat-mcp": "./dist/index.js"
 	},
@@ -19,6 +24,10 @@
 		"prepublishOnly": "bun run build",
 		"test": "jest",
 		"postinstall": "node scripts/ensure-native.mjs"
+	},
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/danieljohnbyns/fb-chat-mcp"
 	},
 	"trustedDependencies": [
 		"meta-messenger.js"
