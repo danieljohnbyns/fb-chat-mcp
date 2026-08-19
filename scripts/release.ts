@@ -106,10 +106,11 @@ console.log('Changes committed and pushed to main branch.');
 const findReleaseBranch = async (major: number, minor: number) => {
 	const prefix = `release/v${major}.${minor}`;
 	const releaseBranches = await git.branch(['-r']);
-	const matches = releaseBranches.all.filter((b) =>
-		b.startsWith(`origin/${prefix}`)
-	);
-	const exact = matches.find((b) => b === `origin/${prefix}`);
+	const remoteBranches = releaseBranches.all
+		.filter((b) => b.startsWith('origin/'))
+		.map((b) => b.replace(/^origin\//, ''));
+	const matches = remoteBranches.filter((b) => b.startsWith(prefix));
+	const exact = matches.find((b) => b === prefix);
 	return exact ?? matches[0] ?? null;
 };
 
