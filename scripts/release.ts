@@ -100,18 +100,16 @@ await git.push('origin', 'main');
 
 console.log('Changes committed and pushed to main branch.');
 
-// Find an existing release branch for a major.minor, preferring the exact
-// persistent 'release/vX.Y' branch and falling back to any legacy
-// full-version branch (e.g. 'release/v1.0.0') with the same major.minor.
+// Release branches are always named 'release/vX.Y' (no patch in the name).
 const findReleaseBranch = async (major: number, minor: number) => {
-	const prefix = `release/v${major}.${minor}`;
+	const branch = `release/v${major}.${minor}`;
 	const releaseBranches = await git.branch(['-r']);
-	const remoteBranches = releaseBranches.all
-		.filter((b) => b.startsWith('origin/'))
-		.map((b) => b.replace(/^origin\//, ''));
-	const matches = remoteBranches.filter((b) => b.startsWith(prefix));
-	const exact = matches.find((b) => b === prefix);
-	return exact ?? matches[0] ?? null;
+	return (
+		releaseBranches.all
+			.filter((b) => b.startsWith('origin/'))
+			.map((b) => b.replace(/^origin\//, ''))
+			.find((b) => b === branch) ?? null
+	);
 };
 
 if (method === 'patch') {
