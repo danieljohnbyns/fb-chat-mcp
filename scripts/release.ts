@@ -100,9 +100,33 @@ await git.push('origin', 'main');
 
 console.log('Changes committed and pushed to main branch.');
 
-// If bump method is 'major' or 'minor', create a new branch for the release
-if (method === 'major' || method === 'minor') {
-	const releaseBranch = `release/v${nextVersion}`;
+// Find an existing release branch for a major.minor, preferring the exact
+// persistent 'release/vX.Y' branch and falling back to any legacy
+// full-version branch (e.g. 'release/v1.0.0') with the same major.minor.
+const findReleaseBranch = async (major: number, minor: number) => {
+	const prefix = `release/v${major}.${minor}`;
+	const releaseBranches = await git.branch(['-r']);
+	const matches = releaseBranches.all.filter((b) =>
+		b.startsWith(`origin/${prefix}`)
+	);
+	const exact = matches.find((b) => b === `origin/${prefix}`);
+	return exact ?? matches[0] ?? null;
+};
+
+if (method === 'patch') {
+	// Patches stay on the existing release branch; never open a new one.
+	const target = await findReleaseBranch(versionParts[0], versionParts[1]);
+	if (!target) {
+		console.error(
+			`Error: No release branch found for 'release/v${versionParts[0]}.${versionParts[1]}'. Run a minor or major release first.`
+		);
+		process.exit(1);
+	};
+	await git.push('origin', `main:${target}`);
+	console.log(`Patched release branch '${target}' up to ${nextVersion}.`);
+} else {
+	// Major/minor bumps open a new persistent 'release/vX.Y' branch.
+	const releaseBranch = `release/v${nextVersionParts[0]}.${nextVersionParts[1]}`;
 	await git.checkoutLocalBranch(releaseBranch);
 	await git.push('origin', releaseBranch);
 	await git.checkout('main');

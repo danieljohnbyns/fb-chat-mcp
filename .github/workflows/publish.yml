@@ -25,15 +25,18 @@ jobs:
         id: version
         run: |
           set -euo pipefail
-          BRANCH_VERSION="${GITHUB_REF_NAME#release/v}"
+          BRANCH_REF="${GITHUB_REF_NAME#release/}"
+          BRANCH_MINOR="$(echo "$BRANCH_REF" | cut -d. -f1-2 | sed 's/^v//')"
           PKG_VERSION="$(node -p "require('./package.json').version")"
-          echo "branch_version=$BRANCH_VERSION" >> "$GITHUB_OUTPUT"
+          PKG_MINOR="$(echo "$PKG_VERSION" | cut -d. -f1-2)"
+          echo "branch_minor=$BRANCH_MINOR" >> "$GITHUB_OUTPUT"
+          echo "pkg_minor=$PKG_MINOR" >> "$GITHUB_OUTPUT"
           echo "version=$PKG_VERSION" >> "$GITHUB_OUTPUT"
 
       - name: Verify version matches branch
         run: |
-          if [ "${{ steps.version.outputs.branch_version }}" != "${{ steps.version.outputs.version }}" ]; then
-            echo "package.json version (${{ steps.version.outputs.version }}) does not match branch ${{ github.ref_name }}" >&2
+          if [ "${{ steps.version.outputs.branch_minor }}" != "${{ steps.version.outputs.pkg_minor }}" ]; then
+            echo "package.json version (${{ steps.version.outputs.version }}) major.minor does not match branch ${{ github.ref_name }}" >&2
             exit 1
           fi
 
