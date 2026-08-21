@@ -73,12 +73,14 @@ The file must contain the cookie **values** (not headers) for `facebook.com`:
 
 If `FB_COOKIES_PATH` is unset, the server looks for `.tmp/cookies.json` relative to the current working directory.
 
-**Cookie persistence.** The server stores the cookies it uses (refreshed periodically from the session) at `~/.config/fb-chat-mcp/cookies.json`:
+**Cookie persistence.** The server stores the cookies it uses (refreshed periodically from the session) in place, at the resolved cookies path:
 
-- Cookie lookup order: `FB_COOKIES_PATH` → `.tmp/cookies.json` → stored cookies at `~/.config/fb-chat-mcp/cookies.json`.
-- If `FB_COOKIES_PATH` and `.tmp/cookies.json` are both missing, the stored cookies are used as the default instead.
-- The stored file is refreshed automatically, so you generally only need to provide cookies once.
-- If there are no cookies in any of the three locations, the server exits with a `No cookies found` error.
+- If `FB_COOKIES_PATH` is set, that file is used exclusively for both reading and writing.
+- Otherwise, `.tmp/cookies.json` (relative to the current working directory) is used.
+- The file is refreshed automatically, so you generally only need to provide cookies once.
+- If there are no valid cookies at the resolved path, the server exits with a `No cookies found` error.
+
+> Migrating from an older version? Previously the server also kept a copy at `~/.config/fb-chat-mcp/cookies.json`. Copy that file to `FB_COOKIES_PATH` or `.tmp/cookies.json` to keep using it.
 
 To get the values: log in to facebook.com in a browser, open DevTools → Application → Cookies, and copy the `c_user`, `xs`, `datr`, and `fr` cookie values.
 
@@ -146,11 +148,11 @@ bun pm trust fb-chat-mcp meta-messenger.js && bun install
 
 **`Cookies file not found at ...`**
 
-Point `FB_COOKIES_PATH` at a valid cookies file (see [Configuration](#configuration)), or let the server fall back to the stored cookies at `~/.config/fb-chat-mcp/cookies.json`.
+Point `FB_COOKIES_PATH` at a valid cookies file (see [Configuration](#configuration)), or drop one at `.tmp/cookies.json`.
 
 **`No cookies found ...`**
 
-The server couldn't find cookies in `FB_COOKIES_PATH`, `.tmp/cookies.json`, or the stored cookies file. Drop a cookies JSON at any of those locations and restart.
+The server couldn't find valid cookies at the resolved path (`FB_COOKIES_PATH`, or `.tmp/cookies.json` when unset). Drop a cookies JSON there and restart.
 
 ## License
 

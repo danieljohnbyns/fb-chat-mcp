@@ -1,6 +1,5 @@
 import { existsSync } from 'node:fs';
 import fs from 'node:fs/promises';
-import os from 'node:os';
 import path from 'node:path';
 import { z } from 'zod';
 import { createStore } from 'zustand/vanilla';
@@ -8,13 +7,6 @@ import { createStore } from 'zustand/vanilla';
 export const cookiesPath =
 	process.env.FB_COOKIES_PATH ??
 	path.join(process.cwd(), '.tmp', 'cookies.json');
-
-export const storedCookiesPath = path.join(
-	os.homedir(),
-	'.config',
-	'fb-chat-mcp',
-	'cookies.json'
-);
 
 const cookiesSchema = z.object({
 	c_user: z.string(),
@@ -48,21 +40,15 @@ export const writeCookiesFile = async (
 };
 
 export const persistCookies = async (cookies: Cookies): Promise<void> => {
-	await Promise.all([
-		writeCookiesFile(storedCookiesPath, cookies),
-		writeCookiesFile(cookiesPath, cookies)
-	]);
+	await writeCookiesFile(cookiesPath, cookies);
 };
 
 const loadCookies = async (): Promise<Cookies> => {
 	const fromPath = await readCookiesFile(cookiesPath);
 	if (fromPath) return fromPath;
 
-	const fromStorage = await readCookiesFile(storedCookiesPath);
-	if (fromStorage) return fromStorage;
-
 	throw new Error(
-		`No cookies found. Provide them via FB_COOKIES_PATH (${cookiesPath}), .tmp/cookies.json, or the stored cookies file (${storedCookiesPath}).`
+		`No cookies found at ${cookiesPath}. Provide them via FB_COOKIES_PATH or .tmp/cookies.json.`
 	);
 };
 
